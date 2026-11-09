@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.legenkiy'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.22.4'
+}
