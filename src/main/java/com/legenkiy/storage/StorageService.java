@@ -29,7 +29,8 @@ public class StorageService {
     public StorageService(Properties properties) throws IOException {
         this.directory = Path.of(properties.getProperty("PATH"));
         Files.createDirectories(directory);
-        this.currentFile = newHistoryFile();
+        List<Path> files = processFileList();
+        this.currentFile = files.isEmpty() ? newHistoryFile() : files.getFirst();
     }
 
     public synchronized void saveTextToHistory(String text) throws IOException {

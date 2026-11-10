@@ -1,43 +1,34 @@
 package com.legenkiy.ui;
 
-import com.legenkiy.history.HistoryService;
+import com.legenkiy.storage.ClipboardScheduler;
 
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.SwingUtilities;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 
 public class MouseListener extends MouseAdapter {
 
-    private JList<String> list;
-    private JFrame frame;
-    private final HistoryService historyService;
+    private final JList<String> list;
+    private final JFrame frame;
+    private final ClipboardScheduler clipboardScheduler;
 
-    public MouseListener(JList<String> list, JFrame frame, HistoryService historyService) {
+    public MouseListener(JList<String> list, JFrame frame, ClipboardScheduler clipboardScheduler) {
         this.list = list;
         this.frame = frame;
-        this.historyService = historyService;
+        this.clipboardScheduler = clipboardScheduler;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        try {
-            if (!SwingUtilities.isLeftMouseButton(e)) return;
+        if (!SwingUtilities.isLeftMouseButton(e)) return;
 
-            int index = list.locationToIndex(e.getPoint());
+        int index = list.locationToIndex(e.getPoint());
+        if (index < 0 || !list.getCellBounds(index, index).contains(e.getPoint())) return;
 
-            if (index < 0 || !list.getCellBounds(index, index).contains(e.getPoint())) return;
-
-            String value = list.getModel().getElementAt(index);
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(value), null);
-            historyService.saveToStorage(value);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        String value = list.getModel().getElementAt(index);
+        clipboardScheduler.copyFromHistory(value);
         frame.dispose();
     }
 
