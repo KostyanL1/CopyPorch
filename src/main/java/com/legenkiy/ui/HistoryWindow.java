@@ -3,10 +3,14 @@ package com.legenkiy.ui;
 import com.legenkiy.Main;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class HistoryWindow extends JFrame {
 

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legenkiy.storage.StorageService;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;

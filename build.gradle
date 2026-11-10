@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'checkstyle'
 }
 
 group = 'com.legenkiy'
@@ -7,6 +8,10 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+checkstyle {
+    toolVersion = "14.3.0"
 }
 
 dependencies {
