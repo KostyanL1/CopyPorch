@@ -22,6 +22,12 @@ import java.util.Properties;
 
 public class Main {
     static void main() throws IOException {
+        StorageService storageService = new StorageService(setupProperties());
+        HistoryService historyService = new HistoryService(storageService);
+        SwingUtilities.invokeLater(() -> openWindow(historyService));
+    }
+
+    private static Properties setupProperties() {
         Properties properties = new Properties();
         String appData = System.getenv().getOrDefault("LOCALAPPDATA", System.getProperty("user.home"));
         properties.setProperty("PATH", Path.of(appData, "CopyPorch", "history").toString());
@@ -31,23 +37,27 @@ public class Main {
             }
             Reader reader = new InputStreamReader(config, StandardCharsets.UTF_8);
             properties.load(reader);
+            return properties;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        StorageService storageService = new StorageService(properties);
-        HistoryService historyService = new HistoryService(storageService);
-        SwingUtilities.invokeLater(() -> openWindow(historyService));
     }
 
     private static void openWindow(HistoryService historyService) {
-        JList<String> list = historyService.getListFromHistory();
-        JPanel content = new JPanel(new BorderLayout());
-        content.add(new JScrollPane(list), BorderLayout.CENTER);
+        try {
+            JList<String> list = null;
+            list = historyService.getListFromHistory();
+            JPanel content = new JPanel(new BorderLayout());
+            content.add(new JScrollPane(list), BorderLayout.CENTER);
 
-        HistoryWindow window = new HistoryWindow(content);
-        list.addMouseListener(new MouseListener(list, window, historyService));
+            HistoryWindow window = new HistoryWindow(content);
+            list.addMouseListener(new MouseListener(list, window, historyService));
 
-        ClipboardScheduler scheduler = new ClipboardScheduler();
-        scheduler.startClipboardMonitor((DefaultListModel<String>) list.getModel());
-        window.setVisible(true);
+            ClipboardScheduler scheduler = new ClipboardScheduler();
+            scheduler.startClipboardMonitor((DefaultListModel<String>) list.getModel());
+            window.setVisible(true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

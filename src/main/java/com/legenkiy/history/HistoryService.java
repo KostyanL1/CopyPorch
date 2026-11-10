@@ -19,21 +19,23 @@ public class HistoryService {
         this.storageService = storageService;
     }
 
-    public void saveToStorage(String value) {
-        try {
+    public void saveToStorage(String value) throws IOException {
             storageService.saveTextToHistory(value);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
-    public JList<String> getListFromHistory() {
+    public JList<String> getListFromHistory() throws IOException {
         String json = storageService.fetchFiles(1);
 
         List<String> list = new ArrayList<>();
-
         Iterator<String> lines = json.lines().iterator();
+        processList(lines, list);
 
+        DefaultListModel<String> model = new DefaultListModel<>();
+        list.forEach(model::addElement);
+        return new JList<>(model);
+    }
+
+    private void processList(Iterator<String> lines, List<String> list) {
         while (lines.hasNext()) {
             String line = lines.next();
             if (line.isBlank()) {
@@ -46,8 +48,5 @@ public class HistoryService {
                 throw new RuntimeException(e);
             }
         }
-        DefaultListModel<String> model = new DefaultListModel<>();
-        list.forEach(model::addElement);
-        return new JList<>(model);
     }
 }
