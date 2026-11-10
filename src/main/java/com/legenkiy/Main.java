@@ -8,10 +8,8 @@ import com.legenkiy.ui.MouseListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,15 +43,11 @@ public class Main {
 
     private static void openWindow(HistoryService historyService) {
         try {
-            JList<String> list = null;
-            list = historyService.getListFromHistory();
-            JPanel content = new JPanel(new BorderLayout());
-            content.add(new JScrollPane(list), BorderLayout.CENTER);
-
-            HistoryWindow window = new HistoryWindow(content);
-            list.addMouseListener(new MouseListener(list, window, historyService));
-
-            ClipboardScheduler scheduler = new ClipboardScheduler();
+            JList<String> list = historyService.getListFromHistory();
+            HistoryWindow window = new HistoryWindow(list);
+            ClipboardScheduler scheduler = new ClipboardScheduler(
+                    Toolkit.getDefaultToolkit().getSystemClipboard(), historyService);
+            list.addMouseListener(new MouseListener(list, window, scheduler));
             scheduler.startClipboardMonitor((DefaultListModel<String>) list.getModel());
             window.setVisible(true);
         } catch (IOException e) {
