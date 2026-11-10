@@ -11,30 +11,32 @@ import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.io.IOException;
+import java.util.Objects;
 
 public class HistoryWindow extends JFrame {
 
+    private static final String ICON_PATH = "/copyporch-icon.png";
+
     public HistoryWindow(JPanel content) {
         super("CopyPorch");
-
         setContentPane(content);
         setSize(400, 300);
         setLocationRelativeTo(null);
-        SystemTray tray = SystemTray.getSystemTray();
+        setupTray();
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    }
 
-
+    private void setupTray( ) {
         try {
-            Image image = ImageIO.read(Main.class.getResource("/copyporch-icon.png"));
+            SystemTray tray = SystemTray.getSystemTray();
+            Image image = ImageIO.read(Objects.requireNonNull(Main.class.getResource(ICON_PATH)));
             TrayIcon icon = new TrayIcon(image);
             icon.setImageAutoSize(true);
-            icon.addActionListener(e ->
-                    SwingUtilities.invokeLater(() -> this.setVisible(true)));
+            icon.addActionListener(e -> SwingUtilities.invokeLater(() -> this.setVisible(true)));
             tray.add(icon);
         } catch (IOException | AWTException e) {
             throw new RuntimeException(e);
         }
-
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     }
 
 }

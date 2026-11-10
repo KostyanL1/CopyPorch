@@ -32,11 +32,8 @@ public class ClipboardScheduler {
                     lastText = text;
                     SwingUtilities.invokeLater(() -> model.addElement(text));
                 }
-            } catch (Exception _) {}
+            } catch (Exception _) {
+            }
         }, INITIAL_DELAY, DELAY_MS, TimeUnit.MILLISECONDS);
-    }
-
-    public void stopClipboardMonitor() {
-        monitor.shutdownNow();
     }
 }

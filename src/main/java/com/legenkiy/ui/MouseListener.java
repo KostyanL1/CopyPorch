@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 public class MouseListener extends MouseAdapter {
 
@@ -24,25 +25,19 @@ public class MouseListener extends MouseAdapter {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (!SwingUtilities.isLeftMouseButton(e)) {
-            return;
+        try {
+            if (!SwingUtilities.isLeftMouseButton(e)) return;
+
+            int index = list.locationToIndex(e.getPoint());
+
+            if (index < 0 || !list.getCellBounds(index, index).contains(e.getPoint())) return;
+
+            String value = list.getModel().getElementAt(index);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(value), null);
+            historyService.saveToStorage(value);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-
-        int index = list.locationToIndex(e.getPoint());
-
-        if (index < 0 ||
-                !list.getCellBounds(index, index).contains(e.getPoint())) {
-            return;
-        }
-
-        String value = list.getModel().getElementAt(index);
-
-        Toolkit.getDefaultToolkit()
-                .getSystemClipboard()
-                .setContents(new StringSelection(value), null);
-
-        historyService.saveToStorage(value);
-
         frame.dispose();
     }
 
