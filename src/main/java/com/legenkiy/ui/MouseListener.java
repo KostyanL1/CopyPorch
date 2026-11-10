@@ -2,12 +2,13 @@ package com.legenkiy.ui;
 
 import com.legenkiy.history.HistoryService;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.SwingUtilities;
+import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 
 public class MouseListener extends MouseAdapter {
 
