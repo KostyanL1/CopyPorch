@@ -53,6 +53,10 @@ public class ClipboardScheduler {
         clipboardInitialized = true;
     }
 
+    public void stopClipboardMonitor() {
+        monitor.shutdown();
+    }
+
     private synchronized String readClipboardChange() {
         String text;
         try {

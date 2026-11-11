@@ -44,9 +44,9 @@ public class Main {
     private static void openWindow(HistoryService historyService) {
         try {
             JList<String> list = historyService.getListFromHistory();
-            HistoryWindow window = new HistoryWindow(list);
             ClipboardScheduler scheduler = new ClipboardScheduler(
                     Toolkit.getDefaultToolkit().getSystemClipboard(), historyService);
+            HistoryWindow window = new HistoryWindow(list, scheduler::stopClipboardMonitor);
             list.addMouseListener(new MouseListener(list, window, scheduler));
             scheduler.startClipboardMonitor((DefaultListModel<String>) list.getModel());
             window.setVisible(true);
