@@ -18,7 +18,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.MenuItem;
 import java.awt.Point;
+import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.MouseAdapter;
@@ -35,7 +37,9 @@ public class HistoryWindow extends JFrame {
     private static final Color TITLE_BACKGROUND = new Color(0x383838);
     private static final Color TITLE_HOVER = new Color(0x525252);
 
-    public HistoryWindow(JList<String> list) {
+    private boolean exiting;
+
+    public HistoryWindow(JList<String> list, Runnable stopClipboardMonitor) {
         super("CopyPorch");
         setUndecorated(true);
         Image image = loadIcon();
@@ -52,7 +56,8 @@ public class HistoryWindow extends JFrame {
         setAlwaysOnTop(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setupTray(image);
+        setupTray(image, stopClipboardMonitor);
+        HistoryHotkey.register(this::toggleHistory);
     }
 
     private JScrollPane createHistoryPane(JList<String> list) {
@@ -163,20 +168,44 @@ public class HistoryWindow extends JFrame {
         }
     }
 
-    private void setupTray(Image image) {
+    private void setupTray(Image image, Runnable stopClipboardMonitor) {
         try {
             SystemTray tray = SystemTray.getSystemTray();
             TrayIcon icon = new TrayIcon(image);
             icon.setImageAutoSize(true);
-            icon.addActionListener(e -> SwingUtilities.invokeLater(() -> {
-                setExtendedState(JFrame.NORMAL);
-                setVisible(true);
-                toFront();
+            icon.addActionListener(e -> SwingUtilities.invokeLater(this::showHistory));
+
+            MenuItem exit = new MenuItem("Exit");
+            exit.addActionListener(e -> SwingUtilities.invokeLater(() -> {
+                exiting = true;
+                stopClipboardMonitor.run();
+                tray.remove(icon);
+                dispose();
             }));
+            PopupMenu menu = new PopupMenu();
+            menu.add(exit);
+            icon.setPopupMenu(menu);
             tray.add(icon);
         } catch (AWTException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void toggleHistory() {
+        if (isVisible() && (getExtendedState() & JFrame.ICONIFIED) == 0) {
+            setVisible(false);
+        } else {
+            showHistory();
+        }
+    }
+
+    private void showHistory() {
+        if (exiting) {
+            return;
+        }
+        setExtendedState(JFrame.NORMAL);
+        setVisible(true);
+        toFront();
     }
 
 }
